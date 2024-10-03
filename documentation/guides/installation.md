@@ -1,6 +1,6 @@
 # Adding Plumbery to an application
 
-To add Plumbery to an application, add `:plumbery` as a dependency:
+To add Plumbery to an application, add `:plumbery` as a dependency to `mix.exs`: 
 
 ```elixir
 defp deps do
