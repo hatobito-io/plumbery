@@ -24,4 +24,5 @@ order and passes the request, potentially modifying it. But the second call
 example is actually more interesting – if any pipe returns an error, the
 pipeline does not call any more pipes downstream and returns immediately. This
 is the default behaviour, and it can be modified like many other aspects of
-pipeline processing. Read the rest of the guides to learn more.
+pipeline processing. Read the rest of the guides and the documentation for
+[`Plumbery.Dsl`](documentation/dsls/DSL:-Plumbery.md) module to learn more.
