@@ -2,10 +2,12 @@ defmodule Plumbery.Docs.Preprocessor do
   @moduledoc false
   @behaviour ExDoc.Markdown
 
+  @impl ExDoc.Markdown
   def available?() do
     ExDoc.Markdown.Earmark.available?()
   end
 
+  @impl ExDoc.Markdown
   def to_ast(text, opts) do
     text
     |> preprocess()
@@ -14,6 +16,7 @@ defmodule Plumbery.Docs.Preprocessor do
 
   defp preprocess(text) do
     text
+    |> remove_comments()
     |> replace_code()
     |> insert_files()
   end
@@ -35,5 +38,9 @@ defmodule Plumbery.Docs.Preprocessor do
     Regex.replace(~r"!file[ \t]+([^ \t\r\n]+)", text, fn _, filename ->
       File.read!(filename)
     end)
+  end
+
+  defp remove_comments(text) do
+    Regex.replace(~r"<!--[^>]*-->", text, "")
   end
 end
