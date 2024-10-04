@@ -36,12 +36,23 @@ defmodule Plumbery.BasicRequestTest do
       %BasicRequest{result: {:error, "err"}} = req
     end
 
-    test "sets result" do
+    test "sets success" do
       req =
         %BasicRequest{}
         |> Request.success(42)
 
       %BasicRequest{result: {:ok, 42}} = req
+    end
+
+    test "sets result" do
+      req = %BasicRequest{}
+      %BasicRequest{result: {:ok, 42}} = {:ok, 42} |> Request.result(req)
+      %BasicRequest{result: {:error, :bad}} = {:error, :bad} |> Request.result(req)
+      %BasicRequest{result: 99} = 99 |> Request.result(req, false)
+
+      assert_raise(ArgumentError, fn ->
+        %BasicRequest{result: 99} = 99 |> Request.result(req)
+      end)
     end
   end
 
@@ -75,12 +86,23 @@ defmodule Plumbery.BasicRequestTest do
       %CustomRequest{result: {:error, "err"}} = req
     end
 
-    test "sets result" do
+    test "sets success" do
       req =
         %CustomRequest{}
         |> Request.success(42)
 
       %CustomRequest{result: {:ok, 42}} = req
+    end
+
+    test "sets result" do
+      req = %CustomRequest{}
+      %CustomRequest{result: {:ok, 42}} = {:ok, 42} |> Request.result(req)
+      %CustomRequest{result: {:error, :bad}} = {:error, :bad} |> Request.result(req)
+      %CustomRequest{result: 99} = 99 |> Request.result(req, false)
+
+      assert_raise(ArgumentError, fn ->
+        %CustomRequest{result: 99} = 99 |> Request.result(req)
+      end)
     end
   end
 end

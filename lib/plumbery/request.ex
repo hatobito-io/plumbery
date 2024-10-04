@@ -78,9 +78,18 @@ defmodule Plumbery.Request do
   @spec result(any(), t(), boolean()) :: t()
   def result(res, req, strict \\ true) when is_boolean(strict) do
     case {strict, res} do
-      {false, res} -> %{req | result: res}
-      {true, {:ok, res}} -> %{req | result: {:ok, res}}
-      {true, {:error, err}} -> %{req | result: {:error, err}}
+      {false, res} ->
+        %{req | result: res}
+
+      {true, {:ok, res}} ->
+        %{req | result: {:ok, res}}
+
+      {true, {:error, err}} ->
+        %{req | result: {:error, err}}
+
+      _ ->
+        raise ArgumentError,
+          message: "In strict mode, only  {:error, _} and {:ok, _} are accepted"
     end
   end
 
