@@ -11,12 +11,9 @@ defmodule Plumbery do
   the pipeline one pipe at a time and each pipe has an opportunity to halt the
   pipeline. After a pipeline is halted, the request is returned from the
   pipeline without going through subsequent pipes in the pipeline
-  * `adapter` is a pipe that converts a struct to another kind of struct.
   * `inlet` is a function that accepts zero or more arguments and returns a
   request. Useful for API entry points that accept arbitrary arguments and
   convert them to a request 
-  * `plumbery` is a collection of pipes that by default share the same request
-  type 
   * `recovery point` a pipe that will be executed even if previous pipe in a pipline
   returned an error.
   """
