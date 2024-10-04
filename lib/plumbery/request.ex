@@ -66,8 +66,23 @@ defmodule Plumbery.Request do
   executed and can further modify the result.
   """
   @spec success(t(), term()) :: t()
-  def success(request, result)
   def success(request, result), do: %{request | result: {:ok, result}}
+
+  @doc """
+  Sets result to `res`. Further steps in the pipeline will be
+  executed and can further modify the result.
+
+  When `strict` is true (the default), only {:error, \\_} and {:ok, \\_} tuples are
+  accepted, otherwise any value can be passed.
+  """
+  @spec result(any(), t(), boolean()) :: t()
+  def result(res, req, strict \\ true) when is_boolean(strict) do
+    case {strict, res} do
+      {false, res} -> %{req | result: res}
+      {true, {:ok, res}} -> %{req | result: {:ok, res}}
+      {true, {:error, err}} -> %{req | result: {:error, err}}
+    end
+  end
 
   @doc """
   Halts the pipeline. No further steps will be executed.
