@@ -5,7 +5,8 @@
 The main concepts of Plumbery are *requests*, *pipelines* and *pipes*.
 
 Pipe is a function taking a struct called a request and returning that struct,
-potentially modifying it. Request is normally a `Plumbery.Request` struct.
+potentially modifying it. We also sometimes call pipes *steps*.
+Request is normally a `Plumbery.Request` struct.
 
 Pipeline is a function taking a request struct and returning that struct,
 potentially modifying it. Note that is the exact description of a pipe, so a
