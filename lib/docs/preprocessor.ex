@@ -15,6 +15,7 @@ defmodule Plumbery.Docs.Preprocessor do
   defp preprocess(text) do
     text
     |> replace_code()
+    |> insert_files()
   end
 
   defp replace_code(text) do
@@ -27,6 +28,12 @@ defmodule Plumbery.Docs.Preprocessor do
       #{content}
       ```
       """
+    end)
+  end
+
+  defp insert_files(text) do
+    Regex.replace(~r"!file[ \t]+([^ \t\r\n]+)", text, fn _, filename ->
+      File.read!(filename)
     end)
   end
 end

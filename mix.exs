@@ -14,13 +14,16 @@ defmodule Plumbery.MixProject do
       source_url: "https://github.com/hatobito-io/plumbery",
       homepage_url: "https://github.com/hatobito-io/plumbery",
       docs: [
+        authors: ["Andrei Demenev"],
         markdown_processor: Plumbery.Docs.Preprocessor,
         api_reference: false,
-        main: "readme",
+        main: "intro",
         extras: [
-          "README.md",
+          "documentation/guides/intro.md",
           "documentation/dsls/DSL:-Plumbery.md",
-          "documentation/guides/installation.md"
+          "documentation/guides/installation.md",
+          "documentation/guides/pipelines.md",
+          "documentation/guides/first_pipeline.md"
         ],
         groups_for_extras: [
           Guides: Path.wildcard("documentation/guides/*.md"),
