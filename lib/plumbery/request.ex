@@ -74,6 +74,14 @@ defmodule Plumbery.Request do
 
   When `strict` is true (the default), only {:error, \\_} and {:ok, \\_} tuples are
   accepted, otherwise any value can be passed.
+
+  result, not request, is the first argument intentionally. It allows for this
+  type of calls:
+
+  ```elixir
+  some_function(req.command)
+  |> result(req)
+  ```
   """
   @spec result(any(), t(), boolean()) :: t()
   def result(res, req, strict \\ true) when is_boolean(strict) do
