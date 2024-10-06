@@ -4,6 +4,7 @@ defmodule Plumbery.MixProject do
   def project do
     [
       app: :plumbery,
+      description: description(),
       version: "0.1.0",
       elixir: "~> 1.14",
       consolidate_protocols: Mix.env() == :prod,
@@ -63,10 +64,15 @@ defmodule Plumbery.MixProject do
     ]
   end
 
+  defp description() do
+    """
+        DSL for building pipelines
+    """
+  end
+
   defp package() do
     [
-      files: ~w(lib priv .formatter.exs mix.exs README* readme* LICENSE*
-                license* CHANGELOG* changelog*),
+      files: ~w(lib .formatter.exs mix.exs README* LICENSE*),
       licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/hatobito-io/plumbery"}
     ]

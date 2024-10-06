@@ -1,11 +1,9 @@
 
 # Plumbery
 
-<!--
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Hexdocs badge](https://img.shields.io/badge/docs-hexdocs-purple)](https://hexdocs.pm/plumbery)
 [![Hex version badge](https://img.shields.io/hexpm/v/plumbery.svg)](https://hex.pm/packages/plumbery)
--->
 
 Plumbery is a framework for building pipelines in a declarative way. Pipeline
 is just a function that accepts a struct and returns the same kind of struct.
