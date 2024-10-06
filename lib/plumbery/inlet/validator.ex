@@ -85,8 +85,8 @@ defmodule Plumbery.Inlet.Validator do
     end
   end
 
-  defp is_valid_arg({:=, pattern, [_, {name, _, nil}]}), do: {name, pattern}
   defp is_valid_arg({:=, _, [{name, _, nil}, pattern]}), do: {name, pattern}
+  defp is_valid_arg({:=, pattern, [_, {name, _, nil}]}), do: {name, pattern}
   defp is_valid_arg({name, _, _}), do: {name, nil}
   defp is_valid_arg(_), do: nil
 
