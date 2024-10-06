@@ -52,7 +52,9 @@ defmodule Plumbery.Request do
   def assign(request, key, value), do: %{request | assigns: Map.put(request.assigns, key, value)}
 
   @doc """
-  Sets result to `{:error, error}`. Further steps in the pipeline will not be
+  Sets result to `{:error, error}`.
+
+  Further steps in the pipeline will not be
   executed except imediately following subsequent steps that are recovery
   points. If the recovery points  return success, execution continues,
   otherwise the pipeline ends. Calling `halt/1` after `error/2` will prevent
@@ -60,6 +62,31 @@ defmodule Plumbery.Request do
   """
   @spec error(t(), term()) :: t()
   def error(request, error), do: %{request | result: {:error, error}}
+
+  @doc """
+  Adds an error and sets result to `{:error, errors}` where `errors`
+  is a list. 
+
+  If `key` is `nil`, `error` will be added to the list, otherwise `{key,
+  error}` tuple will be added. Further steps in the pipeline will not be
+  executed except imediately following subsequent steps that are recovery
+  points. If the recovery points  return success, execution continues,
+  otherwise the pipeline ends. Calling `halt/1` after `add_error/3` will prevent
+  recovery points from execution.
+  """
+  @spec add_error(t(), atom(), term()) :: t()
+  def add_error(request = %{result: res}, key \\ nil, error) do
+    errors =
+      case res do
+        {:error, errors} -> List.wrap(errors)
+        _ -> []
+      end
+
+    case key do
+      nil -> %{request | result: {:error, errors ++ [error]}}
+      key -> %{request | result: {:error, errors ++ [{key, error}]}}
+    end
+  end
 
   @doc """
   Sets result to `{:ok, result}`. Further steps in the pipeline will be
