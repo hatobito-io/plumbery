@@ -64,7 +64,7 @@ defmodule Plumbery.Inlet.Validator do
         end
 
       _ ->
-        {:error, "Invalid signature for inlet function"}
+        inlet |> extract_arguments(rest)
     end
   end
 

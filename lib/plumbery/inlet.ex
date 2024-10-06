@@ -2,6 +2,7 @@ defmodule Plumbery.Inlet do
   @moduledoc false
   defstruct pipeline: nil,
             request: nil,
+            command: nil,
             fields: nil,
             use_context: false,
             signature: nil,
@@ -14,8 +15,16 @@ defmodule Plumbery.Inlet do
   defmacro compile(inlet, module) do
     quote bind_quoted: [inlet: inlet, module: module] do
       command =
-        quote do
-          %{}
+        case inlet.command do
+          nil ->
+            quote do
+              %{}
+            end
+
+          module ->
+            quote do
+              %unquote(module){}
+            end
         end
 
       make_command =
