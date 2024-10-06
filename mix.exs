@@ -6,32 +6,15 @@ defmodule Plumbery.MixProject do
       app: :plumbery,
       version: "0.1.0",
       elixir: "~> 1.14",
-      xonsolidate_protocols: Mix.env() == :prod,
+      consolidate_protocols: Mix.env() == :prod,
       start_permanent: Mix.env() == :prod,
       elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       aliases: aliases(),
       source_url: "https://github.com/hatobito-io/plumbery",
       homepage_url: "https://github.com/hatobito-io/plumbery",
-      docs: [
-        authors: ["Andrei Demenev"],
-        markdown_processor: Plumbery.Docs.Preprocessor,
-        api_reference: false,
-        main: "intro",
-        extras: [
-          "documentation/guides/intro.md",
-          "documentation/dsls/DSL:-Plumbery.md",
-          "documentation/guides/installation.md",
-          "documentation/guides/pipelines.md",
-          "documentation/guides/first_pipeline.md",
-          "documentation/guides/escaping.md",
-          "documentation/guides/inlets.md"
-        ],
-        groups_for_extras: [
-          Guides: Path.wildcard("documentation/guides/*.md"),
-          DSL: Path.wildcard("documentation/dsls/*.md")
-        ]
-      ]
+      docs: docs(),
+      package: package()
     ]
   end
 
@@ -55,6 +38,37 @@ defmodule Plumbery.MixProject do
         "docs"
       ],
       "spark.cheat_sheets": "spark.cheat_sheets --extensions Plumbery.Dsl"
+    ]
+  end
+
+  defp docs do
+    [
+      authors: ["Andrei Demenev"],
+      markdown_processor: Plumbery.Docs.Preprocessor,
+      api_reference: false,
+      main: "intro",
+      extras: [
+        "documentation/guides/intro.md",
+        "documentation/dsls/DSL:-Plumbery.md",
+        "documentation/guides/installation.md",
+        "documentation/guides/pipelines.md",
+        "documentation/guides/first_pipeline.md",
+        "documentation/guides/escaping.md",
+        "documentation/guides/inlets.md"
+      ],
+      groups_for_extras: [
+        Guides: Path.wildcard("documentation/guides/*.md"),
+        DSL: Path.wildcard("documentation/dsls/*.md")
+      ]
+    ]
+  end
+
+  defp package() do
+    [
+      files: ~w(lib priv .formatter.exs mix.exs README* readme* LICENSE*
+                license* CHANGELOG* changelog*),
+      licenses: ["MIT"],
+      links: %{"GitHub" => "https://github.com/hatobito-io/plumbery"}
     ]
   end
 
