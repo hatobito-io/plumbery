@@ -1,4 +1,4 @@
-defmodule Plumbery.RecoveryTest do
+defmodule Plumbery.EsapingTest do
   use ExUnit.Case
 
   defmodule Simple do
@@ -20,25 +20,30 @@ defmodule Plumbery.RecoveryTest do
 
     pipeline :recover1 do
       pipe :error1
-      pipe :success1, recovery_point: true
+      escape_on_error false
+      pipe :success1
     end
 
     pipeline :recover2 do
       pipe :error1
-      pipe :success1, recovery_point: true
+      escape_on_error false
+      pipe :success1
       pipe :success2
     end
 
     pipeline :recover3 do
       pipe :error1
-      pipe :success1, recovery_point: true
-      pipe :success2, recovery_point: true
+      escape_on_error false
+      pipe :success1
+      pipe :success2
+      escape_on_error true
       pipe :error2
       pipe :success3
     end
 
     pipeline :recover_on_entry1 do
-      pipe :error1, recovery_point: true
+      escape_on_error false
+      pipe :error1
     end
 
     pipeline :recover_on_entry2 do
@@ -46,7 +51,7 @@ defmodule Plumbery.RecoveryTest do
     end
 
     pipeline :recover_all do
-      pipes_are_recovery_points true
+      escape_on_error false
       pipe :error1
       pipe :error2
       pipe :error3
@@ -56,29 +61,25 @@ defmodule Plumbery.RecoveryTest do
     end
 
     pipeline :recover_all_with_non_default do
-      pipes_are_recovery_points true
+      escape_on_error false
       pipe :error1
       pipe :error2
       pipe :error3
-      pipe :success1, recovery_point: false
+      escape_on_error true
+      pipe :success1
       pipe :success2
       pipe :success3
     end
 
     pipeline :nested_recovery do
-      recovery_point true
-      pipes_are_recovery_points true
+      escape_on_error false
       pipe :success1
     end
 
     pipeline :recover_nested do
       pipe :error1
+      escape_on_error false
       pipe :nested_recovery
-    end
-
-    pipeline :recover_nested_disabled do
-      pipe :error1
-      pipe :nested_recovery, recovery_point: false
     end
   end
 
@@ -139,12 +140,6 @@ defmodule Plumbery.RecoveryTest do
         assigns: %{trace: [:error1, :success1]}
       } =
         Simple.recover_nested(req)
-
-      %Plumbery.Request{
-        result: {:error, 1},
-        assigns: %{trace: [:error1]}
-      } =
-        Simple.recover_nested_disabled(req)
     end
   end
 end

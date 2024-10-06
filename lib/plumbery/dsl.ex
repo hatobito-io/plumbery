@@ -3,13 +3,6 @@ defmodule Plumbery.Dsl do
   @pipe %Spark.Dsl.Entity{
     describe: """
     Adds a pipe to pipeline.
-
-    A pipe can be a recovery point. When the pipe is a normal function, by
-    default `recovery_point` is inherited from the containing pipeline's
-    `pipes_are_recovery_points` attribute. When the pipe is a pipeline and the
-    containing pipeline's `pipes_are_recovery_points` attribute is not set,
-    then the default value is inherited from the  pipeline's `recovery_point`
-    attribute
     """,
     name: :pipe,
     target: Plumbery.Pipe,
@@ -26,10 +19,6 @@ defmodule Plumbery.Dsl do
         },
         doc:
           "Function to call. Can be either local function name specified as atom, or remote function specified as {Module, :function} tuple. Local functions can be private"
-      ],
-      recovery_point: [
-        type: :boolean,
-        doc: "Specifies whether the pipe is a recovery point."
       ]
     ]
   }
@@ -56,9 +45,20 @@ defmodule Plumbery.Dsl do
     ]
   }
 
+  @escape_on_error %Spark.Dsl.Entity{
+    name: :escape_on_error,
+    target: Plumbery.EscapeOnError,
+    args: [:escape],
+    schema: [
+      escape: [
+        type: :boolean
+      ]
+    ]
+  }
+
   @pipeline %Spark.Dsl.Entity{
     name: :pipeline,
-    entities: [pipes: [@pipe], inlets: [@embedded_inlet]],
+    entities: [pipes: [@pipe, @escape_on_error], inlets: [@embedded_inlet]],
     target: Plumbery.Pipeline,
     transform: {Plumbery.Pipeline.Validator, :validate, []},
     args: [:name],
@@ -67,14 +67,6 @@ defmodule Plumbery.Dsl do
         type: :atom,
         required: true,
         doc: "The name of the pipeline"
-      ],
-      recovery_point: [
-        type: :boolean,
-        doc: "When true, the pipeline by default is a recovery point"
-      ],
-      pipes_are_recovery_points: [
-        type: :boolean,
-        doc: "Specifies the default of `recovery_point` for all pipes in this pipeline"
       ],
       doc: [
         type: :string,

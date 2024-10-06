@@ -23,7 +23,8 @@ defmodule Plumbery.MixProject do
           "documentation/dsls/DSL:-Plumbery.md",
           "documentation/guides/installation.md",
           "documentation/guides/pipelines.md",
-          "documentation/guides/first_pipeline.md"
+          "documentation/guides/first_pipeline.md",
+          "documentation/guides/escaping.md"
         ],
         groups_for_extras: [
           Guides: Path.wildcard("documentation/guides/*.md"),

@@ -54,11 +54,6 @@ defmodule Plumbery.Request do
   @doc """
   Sets result to `{:error, error}`.
 
-  Further steps in the pipeline will not be
-  executed except imediately following subsequent steps that are recovery
-  points. If the recovery points  return success, execution continues,
-  otherwise the pipeline ends. Calling `halt/1` after `error/2` will prevent
-  recovery points from execution.
   """
   @spec error(t(), term()) :: t()
   def error(request, error), do: %{request | result: {:error, error}}
@@ -68,11 +63,7 @@ defmodule Plumbery.Request do
   is a list. 
 
   If `key` is `nil`, `error` will be added to the list, otherwise `{key,
-  error}` tuple will be added. Further steps in the pipeline will not be
-  executed except imediately following subsequent steps that are recovery
-  points. If the recovery points  return success, execution continues,
-  otherwise the pipeline ends. Calling `halt/1` after `add_error/3` will prevent
-  recovery points from execution.
+  error}` tuple will be added.
   """
   @spec add_error(t(), atom(), term()) :: t()
   def add_error(request = %{result: res}, key \\ nil, error) do

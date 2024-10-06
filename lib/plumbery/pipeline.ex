@@ -1,14 +1,11 @@
 defmodule Plumbery.Pipeline do
   @moduledoc false
-  alias Plumbery.Pipeline
 
   defstruct pipes: [],
             name: nil,
             doc: nil,
-            recovery_point: nil,
             unwrap: false,
             private: false,
-            pipes_are_recovery_points: nil,
             inlets: [],
             file_line: nil
 
@@ -18,13 +15,20 @@ defmodule Plumbery.Pipeline do
 
     quote bind_quoted: [pipeline: pipeline, docs: docs] do
       pipes = pipeline.pipes
-      len = length(pipes)
+      len = length(Enum.filter(pipes, &match?(%Plumbery.Pipe{}, &1)))
       name = pipeline.name
       first_name = :"_plumbery_#{pipeline.name}_0"
 
-      Enum.with_index(pipes)
-      |> Enum.each(fn {pipe, index} ->
-        Plumbery.Pipeline.step(pipeline, pipe, index, index == len - 1)
+      pipes
+      |> Enum.reduce({true, 0}, fn pipe, {escape_on_error, index} ->
+        case pipe do
+          %Plumbery.Pipe{} ->
+            Plumbery.Pipeline.step(pipeline, pipe, index, index == len - 1, escape_on_error)
+            {escape_on_error, index + 1}
+
+          %Plumbery.EscapeOnError{} ->
+            {pipe.escape, index}
+        end
       end)
 
       unwrap =
@@ -65,8 +69,14 @@ defmodule Plumbery.Pipeline do
   end
 
   @doc false
-  defmacro step(pipeline, pipe, index, last) do
-    quote bind_quoted: [pipeline: pipeline, index: index, last: last, pipe: pipe] do
+  defmacro step(pipeline, pipe, index, last, escape_on_error) do
+    quote bind_quoted: [
+            pipeline: pipeline,
+            index: index,
+            last: last,
+            pipe: pipe,
+            escape_on_error: escape_on_error
+          ] do
       name = :"_plumbery_#{pipeline.name}_#{index}"
       next_name = :"_plumbery_#{pipeline.name}_#{index + 1}"
 
@@ -85,15 +95,7 @@ defmodule Plumbery.Pipeline do
 
       defp unquote(name)(%{halted?: true} = req), do: req
 
-      recovery =
-        [
-          pipe.recovery_point,
-          pipeline.pipes_are_recovery_points,
-          Plumbery.Pipeline.pipe_is_recovery(__MODULE__, pipe)
-        ]
-        |> Enum.find(&(!is_nil(&1)))
-
-      unless recovery do
+      if escape_on_error do
         defp unquote(name)(%{result: {:error, _}} = req), do: req
       end
 
@@ -120,68 +122,6 @@ defmodule Plumbery.Pipeline do
             unquote(doc)
           end
       end
-    end
-  end
-
-  @doc false
-  def pipe_is_recovery(module, pipe) do
-    function = pipe.function
-
-    {mod, fun, remote} =
-      case function do
-        {mod, fun} -> {mod, fun, true}
-        fun -> {module, fun, false}
-      end
-
-    compiled = !remote || Code.ensure_compiled(mod)
-
-    exists =
-      if remote,
-        do: function_exported?(mod, fun, 1),
-        else: Module.defines?(mod, {fun, 1})
-
-    is_pipeline = is_pipeline(mod, fun)
-
-    case {compiled, exists, is_pipeline} do
-      {{:error, _}, _, _} ->
-        IO.warn(
-          "Module #{inspect(mod)} is not available. Either it does not exist or there is a circular dependency",
-          pipe.file_line
-        )
-
-        false
-
-      {_, false, _} ->
-        IO.warn(
-          "Function #{inspect(fun)} is not available",
-          pipe.file_line
-        )
-
-        false
-
-      {_, _, false} ->
-        pipe.recovery_point
-
-      {_, _, pipeline = %Pipeline{}} ->
-        pipeline.recovery_point
-    end
-  end
-
-  defp is_pipeline(module, func) do
-    try do
-      pipelines =
-        Spark.Dsl.Extension.get_entities(module, [:plumbery])
-        |> Enum.filter(&match?(%Plumbery.Pipeline{name: ^func}, &1))
-
-      case pipelines do
-        [] -> false
-        [pipeline | _] -> pipeline
-      end
-    rescue
-      e in ArgumentError ->
-        if Regex.match?(~r/is not a Spark DSL module/, Exception.message(e)),
-          do: false,
-          else: reraise(e, __STACKTRACE__)
     end
   end
 end

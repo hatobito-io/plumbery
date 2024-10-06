@@ -14,8 +14,6 @@ defmodule Plumbery do
   * `inlet` is a function that accepts zero or more arguments and returns a
   request. Useful for API entry points that accept arbitrary arguments and
   convert them to a request 
-  * `recovery point` a pipe that will be executed even if previous pipe in a pipline
-  returned an error.
   """
   require Plumbery.Inlet
   alias Plumbery.Inlet
