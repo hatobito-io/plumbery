@@ -31,18 +31,39 @@ defmodule Plumbery.Dsl do
     schema: [
       signature: [
         type: :quoted,
-        required: true
+        required: true,
+        doc:
+          "Signature of generated function. Named arguments will be copied to request's `command`"
       ],
       request: [
-        type: :module
+        type: :module,
+        default: Plumbery.Request,
+        doc: "Module that provides the struct to be used as request"
       ],
       command: [
-        type: :module
+        type: :module,
+        doc:
+          "Module that provides the struct to be used as command. If not specified, a map will be used"
       ],
       use_context: [
-        type: :boolean
+        type: :boolean,
+        doc:
+          "When true, an aditional argument will be added to the function, and its value will be copied to request's `context` field"
       ]
     ]
+  }
+
+  @inlet %Spark.Dsl.Entity{
+    @embedded_inlet
+    | schema:
+        @embedded_inlet.schema ++
+          [
+            pipeline: [
+              type: {:or, [:module, {:tuple, [:module, :atom]}]},
+              required: true,
+              doc: "Pipeline to call"
+            ]
+          ]
   }
 
   @escape_on_error %Spark.Dsl.Entity{
@@ -51,7 +72,10 @@ defmodule Plumbery.Dsl do
     args: [:escape],
     schema: [
       escape: [
-        type: :boolean
+        type: :boolean,
+        default: true,
+        doc:
+          "When true, the pipeline will not call any more pipes as soon as one of the pipes returns an error"
       ]
     ]
   }
@@ -66,7 +90,7 @@ defmodule Plumbery.Dsl do
       name: [
         type: :atom,
         required: true,
-        doc: "The name of the pipeline"
+        doc: "The name of the pipeline. This becomes the name of the generated function"
       ],
       doc: [
         type: :string,
@@ -82,32 +106,6 @@ defmodule Plumbery.Dsl do
         type: :boolean,
         default: false,
         doc: "When true, the generated pipeline function is private"
-      ]
-    ]
-  }
-
-  @inlet %Spark.Dsl.Entity{
-    name: :inlet,
-    target: Plumbery.Inlet,
-    transform: {Plumbery.Inlet.Validator, :validate, []},
-    args: [:signature],
-    schema: [
-      signature: [
-        type: :quoted,
-        required: true
-      ],
-      request: [
-        type: :module
-      ],
-      command: [
-        type: :module
-      ],
-      use_context: [
-        type: :boolean
-      ],
-      pipeline: [
-        type: {:or, [:module, {:tuple, [:module, :atom]}]},
-        required: true
       ]
     ]
   }
